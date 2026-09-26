@@ -1,0 +1,41 @@
+# Python and local environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage*
+htmlcov/
+# Downloaded tools, data sources, and generated applications
+.build-tools/
+.verification/
+build/
+dist/
+release/
+*.spec
+/data/*.db
+/data/*.db-*
+/data/*.sqlite*
+*.tmp
+*.log
+# Personal data and secrets (never part of a release)
+Wordroom/
+cache/
+saved.json
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+credentials*.json
+# Machine/editor state
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini

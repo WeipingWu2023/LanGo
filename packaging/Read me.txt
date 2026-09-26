@@ -1,0 +1,39 @@
+WORDROOM 1.1.0
+English dictionary for Windows 10/11 (64-bit Intel/AMD).
+
+INSTALL
+Run Wordroom-Setup-1.1.0-Windows-x64.exe and follow the wizard.
+The desktop shortcut is selected by default. No Python or admin rights needed.
+Open Wordroom from the desktop or Start menu.
+
+SHARE
+Send the single setup EXE to friends. They do not need the source project.
+This initial release is unsigned; Windows may show an unknown-publisher warning.
+
+USE
+Type a word and press Enter. Ctrl+L focuses search.
+770,611 English-Chinese entries are bundled for immediate offline lookup.
+WordNet provides English senses, examples where available, synonyms and antonyms.
+Chinese definitions appear below the headword and in related-word cards.
+Inflected forms can resolve to their base word. Source coverage is not exhaustive.
+Online details are optional: use the button to fetch and cache additional senses.
+Long entries initially show eight senses; use Show more meanings for the rest.
+Examples or relationships that the dictionary does not provide are marked.
+
+PRIVACY AND STORAGE
+Only explicitly requested online searches are sent to api.dictionaryapi.dev.
+Ordinary searches and related-word lookups do not access the network.
+Saved words and cached entries live in %LOCALAPPDATA%\Wordroom.
+Your personal collection is not included in the installer you share.
+
+UNINSTALL / UPDATE
+Uninstall Wordroom in Windows Settings > Apps, or run unins000.exe in its folder.
+Uninstalling preserves your collection and cache for later reinstalls.
+To remove them too, delete %LOCALAPPDATA%\Wordroom after uninstalling.
+Run a newer installer to update the same installation.
+
+DATA SOURCES
+ECDICT: https://github.com/skywind3000/ECDICT (MIT)
+WordNet 3.0: https://wordnet.princeton.edu/
+The bundled database adapts these datasets into SQLite records.
+Full source licenses are in the installed licenses folder.

@@ -1,8 +1,8 @@
-WORDROOM 1.2.0
+WORDROOM 1.2.1
 English dictionary for Windows 10/11 (64-bit Intel/AMD).
 
 INSTALL
-Run Wordroom-Setup-1.2.0-Windows-x64.exe and follow the wizard.
+Run Wordroom-Setup-1.2.1-Windows-x64.exe and follow the wizard.
 The desktop shortcut is selected by default. No Python or admin rights needed.
 Open Wordroom from the desktop or Start menu.
 
@@ -12,7 +12,8 @@ This initial release is unsigned; Windows may show an unknown-publisher warning.
 
 USE
 Startup is blank. Type a word or sentence and press Enter. Ctrl+L focuses search.
-Sentences translate online through MyMemory (English/Chinese, max 500 UTF-8 bytes).
+Sentences translate online through Google Translate (English/Chinese, max 500 UTF-8 bytes).
+The public translation endpoint may be unavailable; translations can be inaccurate.
 Use Translate to force translation. Results can be selected and copied.
 770,611 English-Chinese entries are bundled for immediate offline lookup.
 WordNet provides English senses, examples where available, synonyms and antonyms.
@@ -24,7 +25,7 @@ Empty sections are hidden. Click abbreviated explanations to expand them.
 
 PRIVACY AND STORAGE
 Online details are sent to api.dictionaryapi.dev. Sentence translation sends
-submitted text to api.mymemory.translated.net and depends on its availability/quota.
+submitted text to translate.googleapis.com and depends on its availability/quota.
 Dictionary and related-word lookups remain local. Sentence translations stay
 in memory only, never saved-word files or disk caches.
 Saved words and cached entries live in %LOCALAPPDATA%\Wordroom.

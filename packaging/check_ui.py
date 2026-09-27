@@ -72,7 +72,7 @@ with tempfile.TemporaryDirectory() as temp:
             with patch.object(app.translator, 'translate', return_value='我正在学习英语。') as translator:
                 for sentence in ('I am learning English.', 'I am learning English'):
                     app.lookup(sentence)
-                    wait(app, lambda: app.status.cget('text').startswith('MyMemory'))
+                    wait(app, lambda: app.status.cget('text').startswith('Google Translate'))
                     assert app.search.get() == sentence and app.current == ''
                     assert sentence not in app.saved and sentence not in app.history
                     outputs = [w for frame in app.body.winfo_children() for w in frame.winfo_children() if isinstance(w, tk.Text)]

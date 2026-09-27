@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.1 — sentence translation quality
+
+- Replace MyMemory with Google Translate for whole-sentence translation.
+- Improve the reported “heads spin” example and other tested idioms without hardcoded sentence replacements.
+- Preserve all translated segments, punctuation and the original input.
+- Handle malformed responses, network failures and rate limits without caching failures.
+- Update provider attribution and privacy information; retain the session-only cache.
+- Keep blank startup, concise dictionary results and saved collections unchanged.
+
+The public translation endpoint can change or be unavailable. Translation is still
+machine-generated and may be inaccurate; there is no guarantee for every idiom.
+
 ## 1.2.0 — sentence translation and concise results
 
 - Open with a blank, focused search box and no automatic lookup.

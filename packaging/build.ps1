@@ -18,7 +18,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Tests failed; no installer will be built' }
 if ($LASTEXITCODE -ne 0) { throw 'Application build failed' }
 & $InnoCompiler /Q packaging/Wordroom.iss
 if ($LASTEXITCODE -ne 0) { throw 'Installer build failed' }
-$installer = Get-Item release/Wordroom-Setup-1.2.0-Windows-x64.exe
+$installer = Get-Item release/Wordroom-Setup-1.2.1-Windows-x64.exe
 $checksum = (Get-FileHash -LiteralPath $installer.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
 "$checksum  $($installer.Name)" | Set-Content -Encoding ascii release/SHA256SUMS.txt
 Write-Output "Built $($installer.Name); SHA-256 $checksum"

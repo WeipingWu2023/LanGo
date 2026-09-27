@@ -57,13 +57,17 @@ user's local data directory. Those caches are not included in this repository or
 installer. The application displays the supplied attribution. Retain the entry's
 own license and source metadata if redistributing online content separately.
 
-## Sentence translation (1.2.0)
+## Sentence translation (1.2.1)
 
-MyMemory by Translated: https://mymemory.translated.net/
+Google Translate: https://translate.google.com/
 
-Wordroom uses the public GET translation endpoint, not the contribution endpoint.
-Submitted sentence text is transmitted to that external service. Its API usage
-limits and terms apply: https://mymemory.translated.net/doc/spec.php and
-https://mymemory.translated.net/doc/en/tos.php . No MyMemory software or translation
-corpus is bundled. Translation output is displayed to the requesting user and
-cached only in session memory; it is not included in repository or release assets.
+Submitted text is sent to the public Google Translate web endpoint at
+`translate.googleapis.com`. This is not the supported Google Cloud Translation
+API and has no availability guarantee. No Google credentials, software or
+translation corpus are bundled. Google terms and privacy policy apply:
+https://policies.google.com/terms and https://policies.google.com/privacy .
+Output is displayed to the requesting user and cached only in session memory.
+Wordroom is not affiliated with or endorsed by Google.
+
+Version 1.2.0 used MyMemory by Translated (https://mymemory.translated.net/).
+Version 1.2.1 no longer sends sentences to MyMemory.

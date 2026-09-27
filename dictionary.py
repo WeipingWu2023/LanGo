@@ -102,7 +102,7 @@ def relations(meaning, kind):
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title('Wordroom 1.2 • English–Chinese Dictionary')
+        self.title('Wordroom 1.2.1 • English–Chinese Dictionary')
         icon = ROOT / 'assets' / 'wordroom.ico'
         if icon.exists():
             self.iconbitmap(str(icon))
@@ -170,7 +170,7 @@ class App(tk.Tk):
         self.search.bind('<Return>', lambda e: self.lookup())
         self.button(bar, 'Look up  →', self.lookup, True).pack(side='right')
         self.button(bar, 'Translate', lambda: self.lookup(translate=True)).pack(side='right', padx=5)
-        self.label(main, 'Words: offline · Sentences: online via MyMemory / 单词离线 · 句子联网翻译', 9, MUTED).pack(anchor='w', pady=(8, 0))
+        self.label(main, 'Words: offline · Sentences: online via Google Translate / 单词离线 · 句子联网翻译', 9, MUTED).pack(anchor='w', pady=(8, 0))
         self.status = self.label(main, 'Enter a word or sentence. / 请输入单词或句子。', 10, MUTED)
         self.status.pack(anchor='w', pady=10)
         container = tk.Frame(main, bg=BG)
@@ -289,7 +289,7 @@ class App(tk.Tk):
     def render_translation(self, original, translated):
         self.clear()
         self.current = ''
-        self.status.configure(text='MyMemory · Machine translation / 机器翻译', fg=MUTED)
+        self.status.configure(text='Google Translate · Machine translation / 机器翻译', fg=MUTED)
         for title, text, color in [('Original / 原文', original, WHITE), ('Translation / 译文', translated, '#e4efe5')]:
             frame = tk.Frame(self.body, bg=color, padx=18, pady=15)
             frame.pack(fill='x', pady=8, padx=(0, 5))

@@ -6,12 +6,12 @@ A local English–Chinese dictionary for **Windows 10/11 x64 (Intel/AMD)**.
 
 ## Download and install
 
-Get the **[Wordroom 1.2.0 installer](https://github.com/WeipingWu2023/wordroom/releases/tag/v1.2.0)** from GitHub Releases. Download `Wordroom-Setup-1.2.0-Windows-x64.exe`, run it, and open the new desktop or Start menu shortcut. Python and administrator rights are not required.
+Get the **[Wordroom 1.2.1 installer](https://github.com/WeipingWu2023/wordroom/releases/tag/v1.2.1)** from GitHub Releases. Download `Wordroom-Setup-1.2.1-Windows-x64.exe`, run it, and open the new desktop or Start menu shortcut. Python and administrator rights are not required.
 
 The installer is **unsigned**: Windows may show an unknown-publisher or SmartScreen warning. `SHA256SUMS.txt` in the same release lets you check the download with:
 
 ```powershell
-Get-FileHash .\Wordroom-Setup-1.2.0-Windows-x64.exe -Algorithm SHA256
+Get-FileHash .\Wordroom-Setup-1.2.1-Windows-x64.exe -Algorithm SHA256
 ```
 
 Compare the hash to the checksum file. GitHub's automatic **Source code ZIP is not the installer**.
@@ -24,7 +24,7 @@ Compare the hash to the checksum file. GitHub's automatic **Source code ZIP is n
 - Many inflected words resolve to a base form, such as peasants → peasant.
 - Save words to a personal collection and revisit recent searches.
 - Blank startup: enter your own word or sentence.
-- Sentence translation between English and Chinese through MyMemory (internet required).
+- Sentence translation between English and Chinese through Google Translate (internet required).
 - Three meanings/related words initially; show more on demand. Empty sections are hidden.
 - Click an abbreviated explanation to expand it; translations can be selected or copied.
 
@@ -36,7 +36,7 @@ Ctrl+L focuses the search box. Click a related word to explore it.
 
 Dictionary lookups work offline. Clicking **Online details** sends that word to
 `api.dictionaryapi.dev`; successful responses are cached locally. Sentence
-translation sends the submitted text to `api.mymemory.translated.net`. The app
+translation sends the submitted text to `translate.googleapis.com`. The app
 states this below the search box. Translations are cached only in memory for the
 current session (up to 50), not in saved words or disk caches. No account or API
 key is needed. Avoid submitting confidential text to a public translation service.
@@ -51,7 +51,11 @@ Dictionary coverage is not exhaustive. Missing definitions, examples and relatio
 are omitted. Chinese headword definitions are not translations of every English
 example. Related-word explanations can describe another sense. Sentence translation
 needs internet, accepts at most 500 UTF-8 bytes per request, and is subject to
-MyMemory's usage quota. Machine translations may be inaccurate. Online services
+the provider's rate limits. The public Google Translate web endpoint is not the
+supported Google Cloud API: it can change or be blocked, including on some networks
+in mainland China. There is no automatic fallback to MyMemory. Machine translations
+may still miss idioms or context; this update improves the tested examples, not every
+possible sentence. Online services
 may fail; local word lookup continues working. There is no automatic spelling
 correction. Windows ARM, 32-bit Windows, macOS and Linux are not supported release targets.
 
@@ -92,7 +96,7 @@ Install **Inno Setup 6.7.3** from [its official website](https://jrsoftware.org/
 
 The compiler path above is a standard installation example; pass your own location if different. The script verifies/downloads source data, generates the database and icon, runs automated tests, bundles the app, builds the installer, and writes `release/SHA256SUMS.txt`. Run the UI test separately before releasing. Outputs under `build/`, `dist/`, and `release/` are ignored by Git. Setup keeps a stable AppId so updates use the existing installation.
 
-Version 1.2.0 uses Python 3.12.10, PyInstaller 6.22.3, Pillow 12.2.0 and Inno Setup 6.7.3. Update runtime notices if changing those components. The scripts produce functionally reproducible packages, not a guarantee of byte-identical executables.
+Version 1.2.1 uses Python 3.12.10, PyInstaller 6.22.3, Pillow 12.2.0 and Inno Setup 6.7.3. Update runtime notices if changing those components. The scripts produce functionally reproducible packages, not a guarantee of byte-identical executables.
 
 ## Source and data licenses
 
@@ -100,7 +104,7 @@ Wordroom's original code, starter entries and icon are [MIT licensed](LICENSE). 
 
 The database contains 770,611 ECDICT entries, 206,941 WordNet word/sense records and 62,101 aliases. These overlapping record counts must not be added together as unique words.
 
-See [CHANGELOG.md](CHANGELOG.md) and the [1.2.0 release notes](docs/release-1.2.0.md).
+See [CHANGELOG.md](CHANGELOG.md) and the [1.2.1 release notes](docs/release-1.2.1.md).
 The [1.1.0 milestone](docs/release-1.1.0.md) remains available. Report problems
 through GitHub Issues; do not include saved words, confidential sentences,
 credentials or personal installation logs.

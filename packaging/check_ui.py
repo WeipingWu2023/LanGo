@@ -36,6 +36,10 @@ with tempfile.TemporaryDirectory() as temp:
         release = threading.Event()
         started = threading.Event()
         try:
+            app.update()
+            assert app.search.get() == '' and app.current == '' and not app.history
+            assert not app.pending
+            app.lookup('bright')
             wait(app, lambda: app.current == 'bright')
             original = app.service.lookup
             def delayed(word, online=False):
@@ -52,6 +56,8 @@ with tempfile.TemporaryDirectory() as temp:
             wait(app, lambda: app.current == 'peasant')
             elapsed = time.perf_counter() - before
             assert any('农夫' in text for text in labels(app.body))
+            assert 'ANTONYMS' not in labels(app.body)
+            assert not any('No example' in text or 'No antonyms' in text or 'REMEMBER IT' in text for text in labels(app.body))
             assert elapsed < 1, elapsed
             app.toggle_saved()
             assert 'peasant' in app.saved
@@ -63,7 +69,19 @@ with tempfile.TemporaryDirectory() as temp:
             app.lookup('run')
             wait(app, lambda: app.current == 'run')
             assert any(isinstance(w, tk.Button) and 'Show more meanings' in w.cget('text') for w in app.body.winfo_children())
-            print(f'UI passed: Chinese rendered, save preserved, pagination, search during stalled network ({elapsed * 1000:.0f} ms).')
+            with patch.object(app.translator, 'translate', return_value='我正在学习英语。') as translator:
+                for sentence in ('I am learning English.', 'I am learning English'):
+                    app.lookup(sentence)
+                    wait(app, lambda: app.status.cget('text').startswith('MyMemory'))
+                    assert app.search.get() == sentence and app.current == ''
+                    assert sentence not in app.saved and sentence not in app.history
+                    outputs = [w for frame in app.body.winfo_children() for w in frame.winfo_children() if isinstance(w, tk.Text)]
+                    assert any('我正在学习英语。' in w.get('1.0', 'end') for w in outputs)
+                self_calls = translator.call_count
+                app.lookup('look up')
+                wait(app, lambda: app.current == 'look up')
+                assert translator.call_count == self_calls
+            print(f'UI passed: blank startup, sentence routing, concise sections, Chinese, saved words, pagination, search during stalled network ({elapsed * 1000:.0f} ms).')
         finally:
             release.set()
             app.close()

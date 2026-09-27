@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.2.0 — sentence translation and concise results
+
+- Open with a blank, focused search box and no automatic lookup.
+- Translate English sentences into Chinese and Chinese text into English through MyMemory.
+- Keep dictionary phrases offline when found; translate other multiword input automatically.
+- Add an explicit Translate button, selectable translation text, and Copy translation.
+- Keep sentence text only in a bounded session-memory cache, never saved-word files or disk caches.
+- Show three meanings/related words initially, with more available on demand.
+- Omit empty translations, examples, synonyms and antonyms, and remove repetitive advice.
+- Shorten long explanations by default; click abbreviated text to expand it.
+- Preserve saved collections and the existing installer identity.
+
+Sentence translation needs internet access and is limited to 500 UTF-8 bytes per
+request, plus the provider's usage quota. It is machine translation and may be inaccurate.
+
 ## 1.1.0 — first public release
 
 - Bundle 770,611 ECDICT entries for offline English–Chinese lookup.

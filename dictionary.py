@@ -13,6 +13,7 @@ import urllib.request
 import webbrowser
 import copy
 from offline_dictionary import OfflineDictionary
+from translation import Translator, TranslationError, validate_text
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from tkinter import ttk
@@ -101,7 +102,7 @@ def relations(meaning, kind):
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title('Wordroom 1.1 • English–Chinese Dictionary')
+        self.title('Wordroom 1.2 • English–Chinese Dictionary')
         icon = ROOT / 'assets' / 'wordroom.ico'
         if icon.exists():
             self.iconbitmap(str(icon))
@@ -110,6 +111,7 @@ class App(tk.Tk):
         self.configure(bg=BG)
         self.option_add('*Font', '{Segoe UI} 11')
         self.service = Dictionary()
+        self.translator = Translator()
         self.events = queue.Queue()
         self.executor = ThreadPoolExecutor(max_workers=6)
         self.online_executor = ThreadPoolExecutor(max_workers=2)
@@ -123,7 +125,7 @@ class App(tk.Tk):
         self.build()
         self.bind('<Control-l>', lambda e: (self.search.focus_set(), self.search.selection_range(0, 'end')))
         self.after(70, self.poll)
-        self.lookup('bright')
+        self.search.focus_set()
 
     def read_saved(self):
         try:
@@ -167,7 +169,9 @@ class App(tk.Tk):
         self.search.pack(side='left', fill='x', expand=True, padx=10)
         self.search.bind('<Return>', lambda e: self.lookup())
         self.button(bar, 'Look up  →', self.lookup, True).pack(side='right')
-        self.status = self.label(main, 'Enter a word to explore its meanings.', 10, MUTED)
+        self.button(bar, 'Translate', lambda: self.lookup(translate=True)).pack(side='right', padx=5)
+        self.label(main, 'Words: offline · Sentences: online via MyMemory / 单词离线 · 句子联网翻译', 9, MUTED).pack(anchor='w', pady=(8, 0))
+        self.status = self.label(main, 'Enter a word or sentence. / 请输入单词或句子。', 10, MUTED)
         self.status.pack(anchor='w', pady=10)
         container = tk.Frame(main, bg=BG)
         container.pack(fill='both', expand=True)
@@ -197,22 +201,36 @@ class App(tk.Tk):
             try:
                 if generation != self.generation:
                     return
-                result = self.service.lookup(word, online=kind == 'online')
+                if kind == 'translation':
+                    result = self.translator.translate(word)
+                else:
+                    try:
+                        result = self.service.lookup(word, online=kind == 'online')
+                    except LookupError:
+                        if kind == 'main' and len(word.split()) > 1:
+                            self.events.put((generation, 'translate-needed', key, None, None))
+                            return
+                        raise
                 self.events.put((generation, kind, key, result, None))
             except Exception as exc:
                 self.events.put((generation, kind, key, None, str(exc)))
         self.pending = [future for future in self.pending if not future.done()]
-        executor = self.online_executor if kind == 'online' else self.executor
+        executor = self.online_executor if kind in ('online', 'translation') else self.executor
         self.pending.append(executor.submit(work))
 
     def fetch_online(self, word):
         self.status.configure(text='Loading optional online details… You can keep searching offline.', fg=MUTED)
         self.submit(self.generation, 'online', word, word)
 
-    def lookup(self, word=None):
+    def lookup(self, word=None, translate=False):
         try:
-            word = normalize(word if word is not None else self.search.get())
-        except LookupError as exc:
+            word = validate_text(word if word is not None else self.search.get())
+            if not translate:
+                try:
+                    normalize(word)
+                except LookupError:
+                    translate = True
+        except TranslationError as exc:
             self.status.configure(text=str(exc), fg='#a34335')
             return
         self.search.delete(0, 'end')
@@ -223,9 +241,8 @@ class App(tk.Tk):
             future.cancel()
         self.pending = []
         self.clear()
-        self.label(self.body, f'Looking up “{word}”…', 18).pack(anchor='w', pady=25)
-        self.status.configure(text='Finding meanings and word connections…', fg=MUTED)
-        self.submit(self.generation, 'main', word, word)
+        self.status.configure(text='Translating… / 翻译中…' if translate else 'Looking up… / 查询中…', fg=MUTED)
+        self.submit(self.generation, 'translation' if translate else 'main', word, word)
 
     def clear(self):
         for child in self.body.winfo_children():
@@ -239,6 +256,18 @@ class App(tk.Tk):
                 generation, kind, key, result, error = self.events.get_nowait()
                 if generation != self.generation:
                     continue
+                if kind == 'translate-needed':
+                    self.status.configure(text='Translating… / 翻译中…', fg=MUTED)
+                    self.submit(generation, 'translation', key, key)
+                    continue
+                if kind == 'translation':
+                    if error:
+                        self.clear()
+                        self.status.configure(text=error, fg='#a34335')
+                        self.button(self.body, 'Retry translation / 重试翻译', lambda w=key: self.lookup(w, translate=True)).pack(anchor='w', pady=12)
+                    else:
+                        self.render_translation(key, result)
+                    continue
                 if kind in ('main', 'online'):
                     if error:
                         if kind == 'online':
@@ -250,14 +279,38 @@ class App(tk.Tk):
                         self.button(self.body, 'Online lookup / 联网查询', lambda w=key: self.fetch_online(w)).pack(anchor='w', pady=15)
                         self.status.configure(text='No offline entry / 离线词库未找到', fg='#a34335')
                     else:
-                        self.render(key, *result)
+                        self.render(normalize(key), *result)
                 elif key in self.cards:
                     self.render_relation(key, result, error)
         except queue.Empty:
             pass
         self.after(70, self.poll)
 
-    def render(self, word, entries, source, limit=8):
+    def render_translation(self, original, translated):
+        self.clear()
+        self.current = ''
+        self.status.configure(text='MyMemory · Machine translation / 机器翻译', fg=MUTED)
+        for title, text, color in [('Original / 原文', original, WHITE), ('Translation / 译文', translated, '#e4efe5')]:
+            frame = tk.Frame(self.body, bg=color, padx=18, pady=15)
+            frame.pack(fill='x', pady=8, padx=(0, 5))
+            self.label(frame, title, 10, ACCENT, True).pack(anchor='w')
+            output = tk.Text(frame, height=min(10, max(2, len(text) // 55 + 2)), wrap='word',
+                             bg=color, fg=INK, relief='flat', font=('Segoe UI', 14))
+            output.insert('1.0', text)
+            output.configure(state='disabled')
+            output.pack(fill='x', pady=(8, 0))
+        self.button(self.body, 'Copy translation / 复制译文', lambda: (self.clipboard_clear(), self.clipboard_append(translated))).pack(anchor='w', pady=8)
+
+    def brief_label(self, parent, text, size=11, color=MUTED, maximum=180):
+        text = text.strip()
+        shortened = text[:maximum].rsplit(' ', 1)[0].rstrip(' ,;') + '…' if len(text) > maximum else text
+        label = self.label(parent, shortened, size, color, wraplength=max(280, self.canvas.winfo_width() - 70))
+        if shortened != text:
+            label.configure(cursor='hand2')
+            label.bind('<Button-1>', lambda e: label.configure(text=text if label.cget('text') == shortened else shortened))
+        return label
+
+    def render(self, word, entries, source, limit=3, related_limit=3):
         self.clear()
         self.current = word
         self.status.configure(text=source, fg=MUTED)
@@ -269,51 +322,55 @@ class App(tk.Tk):
         phonetic = next((e.get('phonetic') or next((p['text'] for p in e.get('phonetics', []) if p.get('text')), '') for e in entries), '')
         self.label(self.body, phonetic, 13, MUTED).pack(anchor='w')
         chinese = next((e.get('translation') for e in entries if e.get('translation')), '')
-        translation_card = tk.Frame(self.body, bg='#e4efe5', padx=18, pady=13)
-        translation_card.pack(fill='x', pady=(14, 6), padx=(0, 5))
-        self.label(translation_card, '中文释义', 11, ACCENT, True).pack(anchor='w')
-        self.label(translation_card, chinese or '该词暂无中文释义。', 13, INK, wraplength=620).pack(anchor='w', fill='x', pady=(6, 0))
+        if chinese:
+            translation_card = tk.Frame(self.body, bg='#e4efe5', padx=18, pady=13)
+            translation_card.pack(fill='x', pady=(14, 6), padx=(0, 5))
+            self.label(translation_card, '中文释义', 11, ACCENT, True).pack(anchor='w')
+            self.brief_label(translation_card, chinese, 13, INK).pack(anchor='w', fill='x', pady=(6, 0))
         if entries[0].get('baseForm'):
             self.label(self.body, 'Base form / 原形: ' + entries[0]['baseForm'], 11, MUTED).pack(anchor='w', pady=6)
         self.button(self.body, 'Online details (optional) / 补充在线释义', lambda: self.fetch_online(word)).pack(anchor='w', pady=6)
-        all_meanings = meanings(entries)
+        all_meanings = []
+        for meaning in meanings(entries):
+            definitions = [d for d in meaning.get('definitions', []) if d.get('definition') and
+                           d['definition'] != 'English explanation is not available in the offline source.']
+            if definitions:
+                all_meanings.append(dict(meaning, definitions=definitions))
         parts = list(dict.fromkeys(m.get('partOfSpeech', 'unknown') for m in all_meanings))
-        self.label(self.body, 'PARTS OF SPEECH  /  ' + '  ·  '.join(parts), 10, ACCENT, True).pack(anchor='w', pady=(15, 8))
-        if len(parts) > 1:
-            self.label(self.body, 'The same spelling has different uses. Explore each below.', 10, MUTED).pack(anchor='w', pady=(0, 8))
+        if parts:
+            self.label(self.body, 'PARTS OF SPEECH  /  ' + '  ·  '.join(parts), 10, ACCENT, True).pack(anchor='w', pady=(15, 8))
         for index, meaning in enumerate(all_meanings[:limit]):
             card = tk.Frame(self.body, bg=WHITE, padx=20, pady=18)
             card.pack(fill='x', pady=8, padx=(0, 5))
             pos = meaning.get('partOfSpeech', 'unknown')
             self.label(card, pos.upper(), 11, ACCENT, True).pack(anchor='w', pady=(0, 8))
             for number, definition in enumerate(meaning.get('definitions', []), 1):
-                self.label(card, f'{number:02d}  {definition.get("definition", "")}', 12, wraplength=650).pack(anchor='w', fill='x', pady=(5, 3))
+                self.brief_label(card, f'{number:02d}  {definition.get("definition", "")}', 12, INK).pack(anchor='w', fill='x', pady=(5, 3))
                 example = definition.get('example')
-                self.label(card, f'“{example}”' if example else 'No example sentence supplied by the dictionary.', 11, MUTED, wraplength=650).pack(anchor='w', fill='x', padx=(25, 0), pady=(0, 10))
+                if example:
+                    self.brief_label(card, f'“{example.splitlines()[0]}”').pack(anchor='w', fill='x', padx=(25, 0), pady=(0, 8))
             for kind in ('synonyms', 'antonyms'):
                 words = relations(meaning, kind)
-                self.label(card, kind.upper(), 9, ACCENT if kind == 'synonyms' else '#a06640', True).pack(anchor='w', pady=(12, 5))
                 if not words:
-                    self.label(card, f'No {kind} listed for this part of speech.', 10, MUTED).pack(anchor='w')
                     continue
-                self.label(card, 'Connections depend on the sense and are not always interchangeable.', 9, MUTED).pack(anchor='w', pady=(0, 4))
-                for related in words:
+                self.label(card, kind.upper(), 9, ACCENT if kind == 'synonyms' else '#a06640', True).pack(anchor='w', pady=(12, 5))
+                for related in words[:related_limit]:
                     key = (index, kind, related)
                     frame = tk.Frame(card, bg='#f5f7f3', padx=12, pady=9)
                     frame.pack(fill='x', pady=4)
                     link = self.label(frame, related + '  ↗', 12, ACCENT, True, cursor='hand2')
                     link.pack(anchor='w')
                     link.bind('<Button-1>', lambda e, w=related: self.lookup(w))
-                    detail = self.label(frame, 'Loading explanation and example…', 10, MUTED, wraplength=600)
+                    detail = self.label(frame, '', 10, MUTED, wraplength=600)
                     detail.pack(anchor='w', fill='x', pady=(5, 0))
                     hint = meaning.get('definitions', [{}])[0].get('definition', '') if kind == 'synonyms' else ''
                     self.cards[key] = (detail, pos, hint)
                     self.submit(self.generation, 'related', key, related)
+                if len(words) > related_limit:
+                    self.button(card, f'More {kind}…', lambda: self.render(word, entries, source, limit, 1000)).pack(anchor='w')
         if len(all_meanings) > limit:
             self.button(self.body, f'Show more meanings / 更多释义 ({len(all_meanings) - limit})',
-                        lambda: self.render(word, entries, source, limit + 8)).pack(anchor='w', pady=12)
-        self.label(self.body, 'REMEMBER IT', 10, ACCENT, True).pack(anchor='w', pady=(18, 6))
-        self.label(self.body, 'Choose one meaning. Say a sentence about your own life, then compare a synonym and an antonym.', 11, MUTED, wraplength=650).pack(anchor='w', pady=(0, 18))
+                        lambda: self.render(word, entries, source, limit + 3, related_limit)).pack(anchor='w', pady=12)
         sources = list(dict.fromkeys(url for e in entries for url in e.get('sourceUrls', []) if url.startswith('https://')))
         for url in sources:
             link = self.label(self.body, 'Dictionary source ↗', 9, ACCENT, cursor='hand2')
@@ -337,23 +394,31 @@ class App(tk.Tk):
     def render_relation(self, key, result, error):
         label, pos, hint = self.cards[key]
         if error:
-            label.configure(text='Explanation unavailable. Click the word to retry its lookup.')
+            label.pack_forget()
             return
         entries, _ = result
         candidates = meanings(entries)
         same_pos = [m for m in candidates if m.get('partOfSpeech') == pos]
         selected = (same_pos or candidates)
         if not selected:
-            label.configure(text='No definition supplied by the dictionary.')
+            label.pack_forget()
             return
         meaning = next((m for m in selected if any(d.get('definition') == hint for d in m.get('definitions', []))), selected[0])
         definitions = meaning.get('definitions', [])
         definition = next((d for d in definitions if d.get('example')), definitions[0] if definitions else {})
         example = definition.get('example')
         chinese = next((e.get('translation') for e in entries if e.get('translation')), '')
-        label.configure(text=f'{meaning.get("partOfSpeech", "")} · {definition.get("definition", "No definition available.")}\n'
-                             + (chinese + '\n' if chinese else '暂无中文释义\n')
-                             + (f'“{example}”' if example else 'No example sentence supplied by the dictionary.'))
+        lines = [f'{meaning.get("partOfSpeech", "")} · {definition.get("definition", "")}']
+        if chinese:
+            lines.append(chinese.splitlines()[0])
+        if example:
+            lines.append(f'“{example.splitlines()[0]}”')
+        full = '\n'.join(lines)
+        shortened = '\n'.join(line[:177] + '…' if len(line) > 180 else line for line in lines)
+        label.configure(text=shortened)
+        if shortened != full:
+            label.configure(cursor='hand2')
+            label.bind('<Button-1>', lambda e: label.configure(text=full if label.cget('text') == shortened else shortened))
 
     def refresh_saved(self):
         self.saved_list.delete(0, 'end')

@@ -56,3 +56,14 @@ Online entries and their associated source/license metadata are cached in the
 user's local data directory. Those caches are not included in this repository or
 installer. The application displays the supplied attribution. Retain the entry's
 own license and source metadata if redistributing online content separately.
+
+## Sentence translation (1.2.0)
+
+MyMemory by Translated: https://mymemory.translated.net/
+
+Wordroom uses the public GET translation endpoint, not the contribution endpoint.
+Submitted sentence text is transmitted to that external service. Its API usage
+limits and terms apply: https://mymemory.translated.net/doc/spec.php and
+https://mymemory.translated.net/doc/en/tos.php . No MyMemory software or translation
+corpus is bundled. Translation output is displayed to the requesting user and
+cached only in session memory; it is not included in repository or release assets.

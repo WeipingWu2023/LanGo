@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.0 — detective design and DeepSeek-only learning
+## 1.3.1 — detective design and DeepSeek-only learning
 
 - Replace offline and third-party dictionary/translation services with DeepSeek for every result.
 - Explain English words sense by sense with detailed English definitions and bilingual examples.

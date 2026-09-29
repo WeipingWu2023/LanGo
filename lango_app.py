@@ -1,13 +1,13 @@
-"""Wordroom desktop interface; DeepSeek supplies every result."""
+"""LanGo desktop interface; DeepSeek supplies every result."""
 import json
 import os
 import queue
 import tkinter as tk
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from tkinter import messagebox, simpledialog, ttk
+from tkinter import ttk
 
-from deepseek_client import ServiceError, classify, load_key, lookup, save_key
+from lango_ai import ServiceError, classify, load_key, lookup
 
 ROOT = Path(__file__).resolve().parent
 NAVY, BLUE, GOLD, PAPER, WHITE, INK, MUTED = '#101b35', '#2457c6', '#f2b84b', '#f6f8fd', '#ffffff', '#172747', '#52627d'
@@ -16,14 +16,22 @@ NAVY, BLUE, GOLD, PAPER, WHITE, INK, MUTED = '#101b35', '#2457c6', '#f2b84b', '#
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title('Wordroom 1.3 · The word detective')
-        icon = ROOT / 'assets' / 'wordroom.ico'
+        self.title('LanGo 1.3 · The word detective')
+        icon = ROOT / 'assets' / 'lango.ico'
         if icon.exists(): self.iconbitmap(str(icon))
         self.geometry('1120x820')
         self.minsize(760, 560)
         self.configure(bg=PAPER)
-        self.option_add('*Font', '{Segoe UI} 11')
-        self.directory = Path(os.environ.get('LOCALAPPDATA', ROOT)) / 'Wordroom'
+        # Tk delegates text rasterisation to Windows; Segoe UI Variable and a
+        # modest scaling factor keep glyphs smooth on high-DPI displays.
+        self.tk.call('tk', 'scaling', 1.25)
+        self.option_add('*Font', '{Segoe UI Variable Text} 11')
+        local = Path(os.environ.get('LOCALAPPDATA', ROOT))
+        self.directory = local / 'LanGo'
+        legacy = local / 'Wordroom' / 'saved.json'
+        if not (self.directory / 'saved.json').exists() and legacy.exists():
+            self.directory.mkdir(parents=True, exist_ok=True)
+            (self.directory / 'saved.json').write_bytes(legacy.read_bytes())
         self.events, self.executor, self.generation = queue.Queue(), ThreadPoolExecutor(max_workers=2), 0
         self.current, self.history = '', []
         self.saved = self.read_saved()
@@ -40,7 +48,7 @@ class App(tk.Tk):
         except (OSError, ValueError): return []
 
     def label(self, parent, value, size=11, color=INK, bold=False, **kw):
-        return tk.Label(parent, text=value, font=('Segoe UI', size, 'bold' if bold else 'normal'),
+        return tk.Label(parent, text=value, font=('Segoe UI Variable Text', size, 'bold' if bold else 'normal'),
                         bg=parent.cget('bg'), fg=color, anchor='w', justify='left', **kw)
 
     def button(self, parent, value, command, primary=False):
@@ -52,11 +60,13 @@ class App(tk.Tk):
         side = tk.Frame(self, bg=NAVY, width=225)
         side.pack(side='left', fill='y')
         side.pack_propagate(False)
-        self.label(side, 'WORDROOM', 22, WHITE, True).pack(anchor='w', padx=22, pady=(28, 3))
+        self.label(side, 'LANGO', 22, WHITE, True).pack(anchor='w', padx=22, pady=(28, 3))
         self.label(side, 'THE WORD DETECTIVE  ✦', 10, GOLD, True).pack(anchor='w', padx=22, pady=(0, 15))
         art = ROOT / 'assets' / 'detective.png'
         if art.exists():
-            self.detective_art = tk.PhotoImage(file=str(art)).subsample(7, 7)
+            # The asset is pre-scaled with Lanczos during the build; PhotoImage
+            # must display it at 1:1 to preserve anti-aliased edges.
+            self.detective_art = tk.PhotoImage(file=str(art))
             tk.Label(side, image=self.detective_art, bg=NAVY).pack(anchor='center', pady=(0, 18))
         self.label(side, 'YOUR CASE FILES', 9, '#92b1ec', True).pack(anchor='w', padx=22)
         self.saved_list = tk.Listbox(side, bg=NAVY, fg=WHITE, borderwidth=0,
@@ -67,7 +77,7 @@ class App(tk.Tk):
         self.label(side, 'RECENT CLUES', 9, '#92b1ec', True).pack(anchor='w', padx=22, pady=(13, 5))
         self.recent = tk.Frame(side, bg=NAVY)
         self.recent.pack(fill='x', padx=18)
-        self.button(side, '⚙  DeepSeek key', self.set_key).pack(side='bottom', fill='x', padx=18, pady=20)
+        self.label(side, 'DETECTIVE MODE  ·  ONLINE', 9, GOLD, True).pack(side='bottom', anchor='w', padx=22, pady=24)
         main = tk.Frame(self, bg=PAPER)
         main.pack(side='left', fill='both', expand=True, padx=26, pady=22)
         self.label(main, 'ENGLISH LEARNING · 中英双向翻译', 10, BLUE, True).pack(anchor='w')
@@ -75,7 +85,7 @@ class App(tk.Tk):
         self.label(main, 'Investigate a word. Decode a sentence. Keep the clues that stick.', 11, MUTED).pack(anchor='w', pady=(0, 16))
         bar = tk.Frame(main, bg=WHITE, padx=8, pady=7, highlightbackground='#c7d7f6', highlightthickness=1)
         bar.pack(fill='x')
-        self.search = tk.Entry(bar, relief='flat', font=('Segoe UI', 15), bg=WHITE, fg=INK)
+        self.search = tk.Entry(bar, relief='flat', font=('Segoe UI Variable Text', 15), bg=WHITE, fg=INK)
         self.search.pack(side='left', fill='x', expand=True, padx=10)
         self.search.bind('<Return>', lambda e: self.search_now())
         self.button(bar, 'Investigate  →', self.search_now, True).pack(side='right')
@@ -97,8 +107,6 @@ class App(tk.Tk):
         self.field(card, '✦  YOUR NEXT CLUE', 10, BLUE, True)
         self.field(card, 'Start with a word or a sentence.', 18, INK, True)
         self.field(card, 'DeepSeek explains senses in English, shows Chinese meanings, and pairs examples with translations. Chinese input becomes natural English.', 11, MUTED)
-        if not (self.directory / 'api-key.bin').exists():
-            self.button(card, 'Add DeepSeek key to begin  →', self.set_key, True).pack(anchor='w', pady=(10, 0))
 
     def resize(self, event):
         self.canvas.itemconfigure(self.window, width=event.width)
@@ -123,17 +131,6 @@ class App(tk.Tk):
     def clear(self):
         for child in self.body.winfo_children(): child.destroy()
         self.canvas.yview_moveto(0)
-
-    def set_key(self):
-        value = simpledialog.askstring('DeepSeek API key',
-            'Paste your DeepSeek API key. It is encrypted for this Windows account and never included in the installer.',
-            parent=self, show='•')
-        if value is None: return
-        try:
-            save_key(self.directory / 'api-key.bin', value)
-            self.status.configure(text='DeepSeek key saved locally. Ready to investigate.', fg=BLUE)
-        except (ServiceError, OSError) as exc:
-            messagebox.showerror('DeepSeek key', str(exc), parent=self)
 
     def search_now(self, text=None):
         text = text if text is not None else self.search.get()

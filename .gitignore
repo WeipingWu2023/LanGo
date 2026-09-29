@@ -23,6 +23,7 @@ release/
 *.log
 # Personal data and secrets (never part of a release)
 Wordroom/
+LanGo/
 cache/
 saved.json
 .env

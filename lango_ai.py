@@ -1,7 +1,8 @@
-"""Wordroom's sole lookup and translation provider. No request is logged or cached."""
+"""LanGo's sole lookup and translation provider. No request is logged or cached."""
 import ctypes
 from ctypes import wintypes
 import json
+import os
 import re
 import urllib.error
 import urllib.request
@@ -55,6 +56,9 @@ def save_key(path, key):
 
 
 def load_key(path):
+    configured = os.environ.get('DEEPSEEK_API_KEY', '').strip()
+    if configured:
+        return configured
     try:
         return _protect(path.read_bytes(), decrypt=True).decode('utf-8')
     except FileNotFoundError:
@@ -76,7 +80,7 @@ def classify(text):
     return text, 'en_zh'
 
 
-SYSTEM = '''You are Wordroom, an expert bilingual English teacher and translator.
+SYSTEM = '''You are LanGo, an expert bilingual English teacher and translator.
 Return ONLY a JSON object. Never invent an unsupported synonym, antonym, or pronunciation.
 For an English word, return {"kind":"word","headword":string,"pronunciation":string,
 "senses":[{"part_of_speech":string,"definition_en":string,"definition_zh":string,
@@ -125,7 +129,7 @@ def lookup(text, key):
     request = urllib.request.Request('https://api.deepseek.com/chat/completions', data=payload,
                                      headers={'Authorization': 'Bearer ' + key,
                                               'Content-Type': 'application/json',
-                                              'User-Agent': 'Wordroom/1.3.0'})
+                                              'User-Agent': 'LanGo/1.3.1'})
     try:
         with urllib.request.urlopen(request, timeout=90) as response:
             data = json.load(response)

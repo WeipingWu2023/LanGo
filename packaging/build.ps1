@@ -10,11 +10,11 @@ if (-not $InnoCompiler) { throw 'Install Inno Setup 6.7.3 and pass -InnoCompiler
 if ($LASTEXITCODE -ne 0) { throw 'Icon generation failed' }
 & $Python -m unittest -v
 if ($LASTEXITCODE -ne 0) { throw 'Tests failed; no installer will be built' }
-& $Python -m PyInstaller --noconfirm --windowed --onedir --name Wordroom --icon assets/wordroom.ico --add-data 'assets/wordroom.ico:assets' --add-data 'assets/detective.png:assets' wordroom_app.py
+& $Python -m PyInstaller --noconfirm --windowed --onedir --name LanGo --icon assets/lango.ico --add-data 'assets/lango.ico:assets' --add-data 'assets/detective.png:assets' lango_app.py
 if ($LASTEXITCODE -ne 0) { throw 'Application build failed' }
-& $InnoCompiler /Q packaging/Wordroom.iss
+& $InnoCompiler /Q packaging/LanGo.iss
 if ($LASTEXITCODE -ne 0) { throw 'Installer build failed' }
-$installer = Get-Item release/Wordroom-Setup-1.3.0-Windows-x64.exe
+$installer = Get-Item release/LanGo-Setup-1.3.1-Windows-x64.exe
 $checksum = (Get-FileHash -LiteralPath $installer.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
 "$checksum  $($installer.Name)" | Set-Content -Encoding ascii release/SHA256SUMS.txt
 Write-Output "Built $($installer.Name); SHA-256 $checksum"

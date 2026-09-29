@@ -1,8 +1,8 @@
-WORDROOM 1.3.0
+LANGO 1.3.1
 English-learning detective app for Windows 10/11 x64.
 
 INSTALL
-Run Wordroom-Setup-1.3.0-Windows-x64.exe. The desktop shortcut is selected by default. No Python or administrator rights are needed. The unsigned installer may show an unknown-publisher warning.
+Run LanGo-Setup-1.3.1-Windows-x64.exe. The desktop shortcut is selected by default. No Python or administrator rights are needed. The unsigned installer may show an unknown-publisher warning.
 
 FIRST RUN
 Click Add DeepSeek key to begin and paste your own DeepSeek API key. The app encrypts it for this Windows account. Each person you share the installer with needs their own key. DeepSeek API usage is billed by the provider.
@@ -11,7 +11,7 @@ USE
 Enter an English word for detailed English explanations of its senses, Chinese meanings, usage notes, and bilingual examples. Enter an English sentence to translate it into Chinese, or Chinese text to translate it into natural English. Save English words to your collection.
 
 PRIVACY AND UPDATES
-Every lookup sends the text to api.deepseek.com. The key is stored under %LOCALAPPDATA%\Wordroom as encrypted api-key.bin. Saved words are in saved.json in the same data folder. This installer never includes your key or saved words and updates the existing app without deleting that data. Do not share your key or saved-word folder.
+Every lookup sends the text to api.deepseek.com. The key is stored under %LOCALAPPDATA%\LanGo as encrypted api-key.bin. Saved words are in saved.json in the same data folder. This installer never includes your key or saved words and updates the existing app without deleting that data. Do not share your key or saved-word folder.
 
 LIMITATIONS
 Internet and a valid DeepSeek key are required for every result. AI responses can contain errors and very long answers can hit the response limit. The old offline database is no longer used. The app does not automatically update itself.

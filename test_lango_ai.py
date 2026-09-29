@@ -6,7 +6,7 @@ import urllib.error
 from pathlib import Path
 from unittest.mock import patch
 
-from deepseek_client import ServiceError, classify, load_key, lookup, save_key, validate_result
+from lango_ai import ServiceError, classify, load_key, lookup, save_key, validate_result
 
 
 EXAMPLES = [{'en': f'An example {n}.', 'zh': f'例句{n}。'} for n in range(3)]
@@ -28,7 +28,7 @@ class DeepSeekTests(unittest.TestCase):
         self.assertEqual(classify('The light is on.'), ('The light is on.', 'en_zh'))
         self.assertEqual(classify('我听得一头雾水。'), ('我听得一头雾水。', 'zh_en'))
 
-    def test_deepseek_is_the_only_provider_and_prompt_preserves_text(self):
+    def test_lango_ai_is_the_only_provider_and_prompt_preserves_text(self):
         samples = [('light', WORD), ('我听得一头雾水。', TRANSLATION)]
         for text, expected in samples:
             with self.subTest(text=text), patch('urllib.request.urlopen', return_value=self.response(expected)) as call:

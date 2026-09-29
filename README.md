@@ -2,8 +2,6 @@
 
 LanGo 1.3 is a Windows 10/11 x64 desktop app for learning English with DeepSeek. Its detective theme uses an original character and a new magnifying-glass icon.
 
-![LanGo 1.3 desktop window](docs/screenshots/lango-1.3.png)
-
 ## Install
 
 Download the [LanGo 1.3.4 release](https://github.com/WeipingWu2023/LanGo/releases/tag/v1.3.4), run `LanGo-Setup-1.3.4-Windows-x64.exe`, and open LanGo from the desktop or Start menu. Python and administrator rights are not needed. The installer is unsigned, so Windows may show an unknown-publisher warning. Compare the installer SHA-256 hash with `SHA256SUMS.txt` in the release.

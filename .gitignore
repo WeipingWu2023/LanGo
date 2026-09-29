@@ -39,3 +39,6 @@ credentials*.json
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Per-user encrypted credentials
+api-key.bin

@@ -1,16 +1,18 @@
-"""Draw Wordroom's simple book icon at Windows icon sizes."""
+"""Draw the original detective-themed Wordroom shortcut icon."""
 from pathlib import Path
 from PIL import Image, ImageDraw
 
 root = Path(__file__).resolve().parent.parent
-image = Image.new('RGBA', (256, 256), (0, 0, 0, 0))
+image = Image.new('RGBA', (1024, 1024), (0, 0, 0, 0))
 draw = ImageDraw.Draw(image)
-draw.rounded_rectangle((4, 4, 252, 252), radius=52, fill='#203d34')
-draw.polygon([(45, 63), (112, 74), (128, 87), (144, 74), (211, 63), (211, 187), (145, 197), (128, 208), (111, 197), (45, 187)], fill='#f3f5f1')
-draw.line([(128, 88), (128, 195)], fill='#23745d', width=6)
-for y in (105, 132, 159):
-    draw.line([(62, y), (108, y + 8)], fill='#8cb4a0', width=7)
-    draw.line([(148, y + 8), (194, y)], fill='#8cb4a0', width=7)
+draw.rounded_rectangle((24, 24, 1000, 1000), radius=225, fill='#102044')
+draw.rounded_rectangle((57, 57, 967, 967), radius=195, outline='#4c79e3', width=20)
+draw.ellipse((202, 165, 762, 725), fill='#f7fbff', outline='#f2b84b', width=66)
+draw.ellipse((271, 234, 693, 656), fill='#d9e7ff')
+draw.rounded_rectangle((661, 640, 835, 950), radius=68, fill='#f2b84b', outline='#ffffff', width=21)
+draw.polygon([(480, 300), (516, 397), (620, 398), (539, 462), (569, 565),
+              (480, 508), (391, 565), (421, 462), (340, 398), (444, 397)], fill='#2457c6')
+image = image.resize((256, 256), Image.Resampling.LANCZOS)
 (root / 'assets').mkdir(exist_ok=True)
 image.save(root / 'assets' / 'wordroom.ico', sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
 image.save(root / 'assets' / 'wordroom.png')

@@ -1,110 +1,48 @@
 # Wordroom
 
-A local English–Chinese dictionary for **Windows 10/11 x64 (Intel/AMD)**.
+Wordroom 1.3 is a Windows 10/11 x64 desktop app for learning English with DeepSeek. Its detective theme uses an original character and a new magnifying-glass icon.
 
-![Wordroom 1.2 with a blank startup search](docs/screenshots/wordroom-1.2.png)
+![Wordroom 1.3 desktop window](docs/screenshots/wordroom-1.3.png)
 
-## Download and install
+## Install
 
-Get the **[Wordroom 1.2.1 installer](https://github.com/WeipingWu2023/wordroom/releases/tag/v1.2.1)** from GitHub Releases. Download `Wordroom-Setup-1.2.1-Windows-x64.exe`, run it, and open the new desktop or Start menu shortcut. Python and administrator rights are not required.
+Download the [Wordroom 1.3.0 release](https://github.com/WeipingWu2023/wordroom/releases/tag/v1.3.0), run `Wordroom-Setup-1.3.0-Windows-x64.exe`, and open Wordroom from the desktop or Start menu. Python and administrator rights are not needed. The installer is unsigned, so Windows may show an unknown-publisher warning. Compare the installer SHA-256 hash with `SHA256SUMS.txt` in the release.
 
-The installer is **unsigned**: Windows may show an unknown-publisher or SmartScreen warning. `SHA256SUMS.txt` in the same release lets you check the download with:
+On first launch, click **Add DeepSeek key to begin**. Paste a key from your own DeepSeek account. Each person who installs Wordroom needs their own key. The app encrypts it with Windows DPAPI in `%LOCALAPPDATA%\Wordroom\api-key.bin`; it is usable only by that Windows account. The key is never in the installer or repository. Use **DeepSeek key** in the sidebar to replace it. [DeepSeek's official API guide](https://api-docs.deepseek.com/guides/harness) explains account setup. DeepSeek charges for API use; check [current model prices](https://api-docs.deepseek.com/quick_start/pricing/) before heavy use.
 
-```powershell
-Get-FileHash .\Wordroom-Setup-1.2.1-Windows-x64.exe -Algorithm SHA256
-```
+## Study with Wordroom
 
-Compare the hash to the checksum file. GitHub's automatic **Source code ZIP is not the installer**.
+- Enter an English word to get detailed English definitions grouped by sense and part of speech, Chinese explanations, usage notes, and at least three example sentence pairs per sense. Synonyms and antonyms appear only when relevant.
+- Enter an English sentence for a natural Chinese translation.
+- Enter Chinese text for faithful, fluent English.
+- Save English words to your existing collection. Sentences are not saved.
 
-## Features
+Every result comes from `api.deepseek.com` using the `deepseek-flash` model. Wordroom 1.3 does not use the old offline database, Free Dictionary API, MyMemory, or Google Translate. It needs internet access and a working DeepSeek key for every lookup. AI explanations can still contain mistakes; verify important details. Very long or highly polysemous words may exceed one answer's length; retry with a more specific form if needed.
 
-- 770,611 offline ECDICT entries, with Chinese definitions where available.
-- English meanings, synonyms, antonyms and available examples from WordNet 3.0.
-- Fast indexed local searches; optional online details run separately.
-- Many inflected words resolve to a base form, such as peasants → peasant.
-- Save words to a personal collection and revisit recent searches.
-- Blank startup: enter your own word or sentence.
-- Sentence translation between English and Chinese through Google Translate (internet required).
-- Three meanings/related words initially; show more on demand. Empty sections are hidden.
-- Click an abbreviated explanation to expand it; translations can be selected or copied.
+## Privacy and updates
 
-Type a word or sentence and press Enter. Known dictionary phrases stay offline;
-other multiword input is translated online. Use Translate to force translation.
-Ctrl+L focuses the search box. Click a related word to explore it.
+Your entered text goes to DeepSeek for each lookup. The app does not save responses or API requests to disk. Saved words remain in `%LOCALAPPDATA%\Wordroom\saved.json`, separate from the installed program. Updating Wordroom preserves that folder. The old offline dictionary database may remain on disk after upgrading from 1.2; version 1.3 never reads it.
 
-## Privacy, updates and saved words
+Your API key and saved words are personal data. Do not commit, upload, or send them to someone else. If a key was pasted into a chat or other shared place, revoke it and create a replacement in your [DeepSeek account](https://platform.deepseek.com/).
 
-Dictionary lookups work offline. Clicking **Online details** sends that word to
-`api.dictionaryapi.dev`; successful responses are cached locally. Sentence
-translation sends the submitted text to `translate.googleapis.com`. The app
-states this below the search box. Translations are cached only in memory for the
-current session (up to 50), not in saved words or disk caches. No account or API
-key is needed. Avoid submitting confidential text to a public translation service.
+## Develop and build
 
-The program installs to `%LOCALAPPDATA%\Programs\Wordroom`. Your collection and lookup cache are separate, in `%LOCALAPPDATA%\Wordroom` (`saved.json` and `cache/`). Copy that data folder somewhere safe to back it up. Updating through the installer preserves it. Uninstalling also leaves it in place. The repository and installer contain no personal saved words or lookup caches. Recent-search buttons are session-only.
-
-There is no automatic updater. Download and run a newer installer when a release becomes available.
-
-## Known limitations
-
-Dictionary coverage is not exhaustive. Missing definitions, examples and relationships
-are omitted. Chinese headword definitions are not translations of every English
-example. Related-word explanations can describe another sense. Sentence translation
-needs internet, accepts at most 500 UTF-8 bytes per request, and is subject to
-the provider's rate limits. The public Google Translate web endpoint is not the
-supported Google Cloud API: it can change or be blocked, including on some networks
-in mainland China. There is no automatic fallback to MyMemory. Machine translations
-may still miss idioms or context; this update improves the tested examples, not every
-possible sentence. Online services
-may fail; local word lookup continues working. There is no automatic spelling
-correction. Windows ARM, 32-bit Windows, macOS and Linux are not supported release targets.
-
-## Run from source (developers)
-
-Use **Python 3.12.10 x64 with Tcl/Tk** on Windows (the standard python.org installer). Start in the repository root. Runtime code uses Python's standard library; no third-party runtime package is needed.
+Use Python 3.12 x64 on Windows. Runtime code uses the standard library. Clone this repository and run:
 
 ```powershell
-git clone https://github.com/WeipingWu2023/wordroom.git
-cd wordroom
 python -m venv .venv
-.\.venv\Scripts\python.exe packaging/fetch_data.py
-.\.venv\Scripts\python.exe packaging/build_dictionary.py
-.\.venv\Scripts\python.exe dictionary.py
-```
-
-The first data download requires internet access. The large database is deliberately not tracked by Git. [Data instructions](data/README.md) describe the pinned sources, checksum verification, and generation. The original small starter entries are also bundled. `Start Wordroom.vbs` is an optional source launcher when `pythonw.exe` is on PATH.
-
-## Test
-
-Generate the database first, then run:
-
-```powershell
+.\.venv\Scripts\python.exe wordroom_app.py
 .\.venv\Scripts\python.exe -m unittest -v
 .\.venv\Scripts\python.exe packaging/check_ui.py
 ```
 
-The UI test needs an interactive Windows desktop. It uses a temporary data folder, not your saved collection. Tests cover offline and cached lookup, Chinese display, inflections, missing words, network errors, relationships, pagination, and local search during a stalled online request.
-
-## Build the Windows installer
-
-Install **Inno Setup 6.7.3** from [its official website](https://jrsoftware.org/isdl.php), then install the pinned Python build requirements:
+To build the installer, install [Inno Setup 6](https://jrsoftware.org/isdl.php) and the pinned build dependencies, then run:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements-build.txt
-.\packaging\build.ps1 -Python .\.venv\Scripts\python.exe -InnoCompiler "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+.\packaging\build.ps1 -Python .\.venv\Scripts\python.exe
 ```
 
-The compiler path above is a standard installation example; pass your own location if different. The script verifies/downloads source data, generates the database and icon, runs automated tests, bundles the app, builds the installer, and writes `release/SHA256SUMS.txt`. Run the UI test separately before releasing. Outputs under `build/`, `dist/`, and `release/` are ignored by Git. Setup keeps a stable AppId so updates use the existing installation.
+The build produces `release/Wordroom-Setup-1.3.0-Windows-x64.exe` and `release/SHA256SUMS.txt`. Build output and personal data are ignored by Git. The API key is entered by each user after installation. Run the UI check with a desktop session; it uses a temporary user-data directory and fake key.
 
-Version 1.2.1 uses Python 3.12.10, PyInstaller 6.22.3, Pillow 12.2.0 and Inno Setup 6.7.3. Update runtime notices if changing those components. The scripts produce functionally reproducible packages, not a guarantee of byte-identical executables.
-
-## Source and data licenses
-
-Wordroom's original code, starter entries and icon are [MIT licensed](LICENSE). The offline database contains separately licensed [ECDICT](https://github.com/skywind3000/ECDICT) and [WordNet 3.0](https://wordnet.princeton.edu/) data; it is not wholly covered by Wordroom's MIT license. Full attribution and runtime notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and [packaging/licenses](packaging/licenses).
-
-The database contains 770,611 ECDICT entries, 206,941 WordNet word/sense records and 62,101 aliases. These overlapping record counts must not be added together as unique words.
-
-See [CHANGELOG.md](CHANGELOG.md) and the [1.2.1 release notes](docs/release-1.2.1.md).
-The [1.1.0 milestone](docs/release-1.1.0.md) remains available. Report problems
-through GitHub Issues; do not include saved words, confidential sentences,
-credentials or personal installation logs.
+Wordroom code, the original detective artwork, and icon are [MIT licensed](LICENSE). Runtime and service notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Earlier releases with ECDICT/WordNet remain available through their version tags and release assets; those datasets are not shipped in version 1.3. See [CHANGELOG.md](CHANGELOG.md).

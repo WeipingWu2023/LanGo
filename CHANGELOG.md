@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.0 — detective design and DeepSeek-only learning
+
+- Replace offline and third-party dictionary/translation services with DeepSeek for every result.
+- Explain English words sense by sense with detailed English definitions and bilingual examples.
+- Translate English to Chinese and Chinese to natural English.
+- Add original detective illustration and a redesigned magnifying-glass shortcut icon.
+- Encrypt each user’s API key with Windows DPAPI; preserve existing saved words.
+- Distinguish missing key, invalid key, insufficient balance, rate limit and network errors.
+
+
 ## 1.2.1 — sentence translation quality
 
 - Replace MyMemory with Google Translate for whole-sentence translation.

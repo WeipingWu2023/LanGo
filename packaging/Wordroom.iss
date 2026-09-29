@@ -1,4 +1,4 @@
-#define AppVersion "1.2.1"
+#define AppVersion "1.3.0"
 
 [Setup]
 AppId={{457D924A-AB84-43F3-9F4B-D0490D04A45B}
@@ -32,7 +32,6 @@ Source: "..\packaging\Read me.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "licenses\*"; DestDir: "{app}\licenses"; Flags: ignoreversion
 Source: "..\LICENSE"; DestDir: "{app}\licenses"; DestName: "Wordroom-MIT.txt"; Flags: ignoreversion
 Source: "..\THIRD_PARTY_NOTICES.md"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\data\sources.json"; DestDir: "{app}\licenses"; Flags: ignoreversion
 
 [Icons]
 Name: "{autodesktop}\Wordroom"; Filename: "{app}\Wordroom.exe"; Tasks: desktopicon

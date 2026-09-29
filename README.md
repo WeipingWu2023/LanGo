@@ -6,7 +6,7 @@ LanGo 1.3 is a Windows 10/11 x64 desktop app for learning English with DeepSeek.
 
 ## Install
 
-Download the [LanGo 1.3.2 release](https://github.com/WeipingWu2023/wordroom/releases/tag/v1.3.2), run `LanGo-Setup-1.3.2-Windows-x64.exe`, and open LanGo from the desktop or Start menu. Python and administrator rights are not needed. The installer is unsigned, so Windows may show an unknown-publisher warning. Compare the installer SHA-256 hash with `SHA256SUMS.txt` in the release.
+Download the [LanGo 1.3.2 release](https://github.com/WeipingWu2023/LanGo/releases/tag/v1.3.2), run `LanGo-Setup-1.3.2-Windows-x64.exe`, and open LanGo from the desktop or Start menu. Python and administrator rights are not needed. The installer is unsigned, so Windows may show an unknown-publisher warning. Compare the installer SHA-256 hash with `SHA256SUMS.txt` in the release.
 
 The app has no API-key prompt. Configure `DEEPSEEK_API_KEY` in the Windows user's environment before launching it; the app reads it behind the scenes. Each person who installs LanGo needs their own key. Never put a key in the installer or repository. [DeepSeek's official API guide](https://api-docs.deepseek.com/guides/harness) explains account setup. DeepSeek charges for API use; check [current model prices](https://api-docs.deepseek.com/quick_start/pricing/) before heavy use.
 

@@ -14,7 +14,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Tests failed; no installer will be built' }
 if ($LASTEXITCODE -ne 0) { throw 'Application build failed' }
 & $InnoCompiler /Q packaging/LanGo.iss
 if ($LASTEXITCODE -ne 0) { throw 'Installer build failed' }
-$installer = Get-Item release/LanGo-Setup-1.3.1-Windows-x64.exe
+$installer = Get-Item release/LanGo-Setup-1.3.2-Windows-x64.exe
 $checksum = (Get-FileHash -LiteralPath $installer.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
 "$checksum  $($installer.Name)" | Set-Content -Encoding ascii release/SHA256SUMS.txt
 Write-Output "Built $($installer.Name); SHA-256 $checksum"

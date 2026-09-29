@@ -62,9 +62,9 @@ def load_key(path):
     try:
         return _protect(path.read_bytes(), decrypt=True).decode('utf-8')
     except FileNotFoundError:
-        raise ServiceError('Add your DeepSeek API key in Settings. / 请在设置中添加 DeepSeek 密钥。') from None
+        raise ServiceError('Set DEEPSEEK_API_KEY for this Windows user before launching LanGo. / 请先为当前 Windows 用户设置 DEEPSEEK_API_KEY。') from None
     except (OSError, UnicodeError):
-        raise ServiceError('Stored key cannot be read on this Windows account. Add it again in Settings. / 请重新添加密钥。') from None
+        raise ServiceError('Stored key cannot be read on this Windows account. Set DEEPSEEK_API_KEY and relaunch LanGo. / 请设置 DEEPSEEK_API_KEY 后重启 LanGo。') from None
 
 
 def classify(text):
@@ -129,7 +129,7 @@ def lookup(text, key):
     request = urllib.request.Request('https://api.deepseek.com/chat/completions', data=payload,
                                      headers={'Authorization': 'Bearer ' + key,
                                               'Content-Type': 'application/json',
-                                              'User-Agent': 'LanGo/1.3.1'})
+                                               'User-Agent': 'LanGo/1.3.2'})
     try:
         with urllib.request.urlopen(request, timeout=90) as response:
             data = json.load(response)
@@ -138,7 +138,7 @@ def lookup(text, key):
             raise ServiceError('The answer was too long. Try a shorter input. / 回答过长，请缩短输入。')
         return validate_result(json.loads(content), kind)
     except urllib.error.HTTPError as exc:
-        messages = {401: 'API key rejected. Check Settings. / 密钥无效，请检查设置。',
+        messages = {401: 'API key rejected. Check DEEPSEEK_API_KEY. / 密钥无效，请检查 DEEPSEEK_API_KEY。',
                     402: 'DeepSeek balance is insufficient. / DeepSeek 余额不足。',
                     429: 'DeepSeek is busy or rate-limiting requests. Retry shortly. / 请求过多，请稍后重试。'}
         raise ServiceError(messages.get(exc.code, 'DeepSeek service error. Please retry. / 服务出错，请重试。')) from None

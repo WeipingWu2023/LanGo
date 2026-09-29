@@ -1,4 +1,4 @@
-#define AppVersion "1.3.2"
+#define AppVersion "1.3.3"
 
 [Setup]
 AppId={{B3A6E2D8-3C51-4D12-9A20-7D4C8E1F6B90}
@@ -29,6 +29,7 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription:
 [Files]
 Source: "..\dist\LanGo\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\packaging\LanGo Read me.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\settings.example.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "licenses\*"; DestDir: "{app}\licenses"; Flags: ignoreversion
 Source: "..\LICENSE"; DestDir: "{app}\licenses"; DestName: "LanGo-MIT.txt"; Flags: ignoreversion
 Source: "..\THIRD_PARTY_NOTICES.md"; DestDir: "{app}"; Flags: ignoreversion
@@ -39,3 +40,4 @@ Name: "{autoprograms}\LanGo"; Filename: "{app}\LanGo.exe"
 
 [Run]
 Filename: "{app}\LanGo.exe"; Description: "Open LanGo"; Flags: nowait postinstall skipifsilent
+

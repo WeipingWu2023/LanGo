@@ -1,12 +1,12 @@
 # Changelog
 
-## 1.3.2 — detective design and DeepSeek-only learning
+## 1.3.3 — detective design and DeepSeek-only learning
 
 - Replace offline and third-party dictionary/translation services with DeepSeek for every result.
 - Explain English words sense by sense with detailed English definitions and bilingual examples.
 - Translate English to Chinese and Chinese to natural English.
 - Add original detective illustration and a redesigned magnifying-glass shortcut icon.
-- Encrypt each user’s API key with Windows DPAPI; preserve existing saved words.
+- Configure each user's key through an ignored per-user settings.json file; preserve existing saved words.
 - Distinguish missing key, invalid key, insufficient balance, rate limit and network errors.
 
 
@@ -55,3 +55,4 @@ sentence translations; optional online service may fail; installer is unsigned.
 ## 1.0.0 — earlier local milestone (not a GitHub release)
 
 - Original desktop dictionary, starter entries, online lookup, cache, and saved words.
+

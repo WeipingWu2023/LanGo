@@ -59,12 +59,19 @@ def load_key(path):
     configured = os.environ.get('DEEPSEEK_API_KEY', '').strip()
     if configured:
         return configured
+    settings = path if path.suffix.lower() == '.json' else path.with_name('settings.json')
+    try:
+        value = json.loads(settings.read_text(encoding='utf-8')).get('deepseek_api_key', '')
+        if isinstance(value, str) and re.fullmatch(r'sk-[A-Za-z0-9_-]{16,}', value.strip()):
+            return value.strip()
+    except (FileNotFoundError, OSError, UnicodeError, ValueError, AttributeError):
+        pass
     try:
         return _protect(path.read_bytes(), decrypt=True).decode('utf-8')
     except FileNotFoundError:
-        raise ServiceError('Set DEEPSEEK_API_KEY for this Windows user before launching LanGo. / 请先为当前 Windows 用户设置 DEEPSEEK_API_KEY。') from None
+        raise ServiceError('Add your key to %LOCALAPPDATA%\\LanGo\\settings.json, then restart LanGo. / 请将密钥写入该文件后重启 LanGo。') from None
     except (OSError, UnicodeError):
-        raise ServiceError('Stored key cannot be read on this Windows account. Set DEEPSEEK_API_KEY and relaunch LanGo. / 请设置 DEEPSEEK_API_KEY 后重启 LanGo。') from None
+        raise ServiceError('The key in %LOCALAPPDATA%\\LanGo\\settings.json is invalid. / 设置文件中的密钥无效。') from None
 
 
 def classify(text):

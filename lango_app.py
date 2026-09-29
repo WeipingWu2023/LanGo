@@ -136,7 +136,7 @@ class App(tk.Tk):
         text = text if text is not None else self.search.get()
         try:
             text, _ = classify(text)
-            key = load_key(self.directory / 'api-key.bin')
+            key = load_key(self.directory / 'settings.json')
         except ServiceError as exc:
             self.status.configure(text=str(exc), fg='#b84439')
             return

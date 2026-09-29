@@ -56,7 +56,7 @@ class DeepSeekTests(unittest.TestCase):
     def test_encrypted_key_round_trip_and_missing_key(self):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / 'api-key.bin'
-            with self.assertRaisesRegex(ServiceError, 'DEEPSEEK_API_KEY'):
+            with self.assertRaisesRegex(ServiceError, 'settings.json'):
                 load_key(path)
             fake = 'sk-' + 'a' * 32
             try:

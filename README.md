@@ -10,6 +10,18 @@ Download the [LanGo 1.3.3 release](https://github.com/WeipingWu2023/LanGo/releas
 
 The app has no API-key prompt. After installing, copy `settings.example.json` from the LanGo install folder to `%LOCALAPPDATA%\\LanGo\\settings.json`, then replace `sk-your-key-here` with your own key. Each person who installs LanGo can configure their own file. Never put a key in the installer or repository. [DeepSeek's official API guide](https://api-docs.deepseek.com/guides/harness) explains account setup. DeepSeek charges for API use; check [current model prices](https://api-docs.deepseek.com/quick_start/pricing/) before heavy use.
 
+### Beginner setup, step by step
+
+1. Close LanGo if it is already running.
+2. Press **Win + R**, enter `%LOCALAPPDATA%\\Programs\\LanGo`, and press **Enter**.
+3. Copy `settings.example.json`.
+4. Press **Win + R** again, enter `%LOCALAPPDATA%\\LanGo`, and press **Enter**.
+5. Paste the file there and rename it to `settings.json`.
+6. Open `settings.json` in Notepad. Replace `sk-your-key-here` with your own DeepSeek key, then save it.
+7. Start LanGo and search for a word or sentence.
+
+The real `settings.json` belongs only on your computer. Do not upload it to GitHub. The repository contains only the safe `settings.example.json` template. If Windows hides file extensions, turn on **View → Show → File name extensions** in File Explorer so the file does not accidentally become `settings.json.json`.
+
 ## Study with LanGo
 
 - Enter an English word to get detailed English definitions grouped by sense and part of speech, Chinese explanations, usage notes, and at least three example sentence pairs per sense. Synonyms and antonyms appear only when relevant.

@@ -33,7 +33,8 @@ class App(tk.Tk):
             self.directory.mkdir(parents=True, exist_ok=True)
             (self.directory / 'saved.json').write_bytes(legacy.read_bytes())
         self.events, self.executor, self.generation = queue.Queue(), ThreadPoolExecutor(max_workers=2), 0
-        self.current, self.history = '', []
+        self.current, self.current_result, self.history = '', None, []
+        self.saved_results = self.read_saved_results()
         self.saved = self.read_saved()
         self.protocol('WM_DELETE_WINDOW', self.close)
         self.build()
@@ -46,6 +47,12 @@ class App(tk.Tk):
             value = json.loads((self.directory / 'saved.json').read_text(encoding='utf-8'))
             return [w for w in value if isinstance(w, str)] if isinstance(value, list) else []
         except (OSError, ValueError): return []
+
+    def read_saved_results(self):
+        try:
+            value = json.loads((self.directory / 'saved_results.json').read_text(encoding='utf-8'))
+            return value if isinstance(value, dict) else {}
+        except (OSError, ValueError): return {}
 
     def label(self, parent, value, size=11, color=INK, bold=False, **kw):
         return tk.Label(parent, text=value, font=('Segoe UI Variable Text', size, 'bold' if bold else 'normal'),
@@ -88,6 +95,8 @@ class App(tk.Tk):
         self.search = tk.Entry(bar, relief='flat', font=('Segoe UI Variable Text', 15), bg=WHITE, fg=INK)
         self.search.pack(side='left', fill='x', expand=True, padx=10)
         self.search.bind('<Return>', lambda e: self.search_now())
+        self.search.bind('<KeyRelease>', self.on_search_changed)
+        self.button(bar, 'Clear ×', self.clear_search).pack(side='right', padx=(0, 6))
         self.button(bar, 'Investigate  →', self.search_now, True).pack(side='right')
         self.status = self.label(main, 'Enter an English word, an English sentence, or Chinese text.', 10, MUTED)
         self.status.pack(anchor='w', pady=11)
@@ -132,6 +141,21 @@ class App(tk.Tk):
         for child in self.body.winfo_children(): child.destroy()
         self.canvas.yview_moveto(0)
 
+    def on_search_changed(self, _event=None):
+        if not self.search.get().strip():
+            self.cancel_search()
+
+    def clear_search(self):
+        self.search.delete(0, 'end')
+        self.cancel_search()
+
+    def cancel_search(self):
+        self.generation += 1
+        self.current = ''
+        self.current_result = None
+        self.clear()
+        self.status.configure(text='Search cancelled. Enter a new word or sentence.', fg=MUTED)
+
     def search_now(self, text=None):
         text = text if text is not None else self.search.get()
         try:
@@ -145,6 +169,7 @@ class App(tk.Tk):
         self.generation += 1
         generation = self.generation
         self.current = ''
+        self.current_result = None
         self.clear()
         self.status.configure(text='DeepSeek is investigating… / 正在分析…', fg=BLUE)
         def work():
@@ -168,6 +193,7 @@ class App(tk.Tk):
 
     def render_word(self, text, result):
         self.current = text.lower()
+        self.current_result = result
         self.status.configure(text='DeepSeek · English learning dossier / 英语学习档案', fg=MUTED)
         head = self.card(NAVY)
         self.field(head, result.get('headword') or text, 29, WHITE, True)
@@ -212,16 +238,36 @@ class App(tk.Tk):
 
     def open_saved(self, event):
         selected = self.saved_list.curselection()
-        if selected: self.search_now(self.saved_list.get(selected[0]))
+        if not selected: return
+        word = self.saved_list.get(selected[0])
+        cached = self.saved_results.get(word.lower())
+        if cached:
+            self.generation += 1
+            self.search.delete(0, 'end')
+            self.search.insert(0, word)
+            self.current = ''
+            self.current_result = None
+            self.clear()
+            self.render_word(word, cached)
+        else:
+            self.search_now(word)
 
     def toggle_saved(self):
         if not self.current: return
-        updated = [w for w in self.saved if w != self.current] if self.current in self.saved else self.saved + [self.current]
+        removing = self.current in self.saved
+        updated = [w for w in self.saved if w != self.current] if removing else self.saved + [self.current]
         try:
             self.directory.mkdir(parents=True, exist_ok=True)
             temporary = self.directory / 'saved.tmp'
             temporary.write_text(json.dumps(updated, ensure_ascii=False), encoding='utf-8')
             temporary.replace(self.directory / 'saved.json')
+            if removing:
+                self.saved_results.pop(self.current, None)
+            elif self.current_result:
+                self.saved_results[self.current] = self.current_result
+            result_tmp = self.directory / 'saved_results.tmp'
+            result_tmp.write_text(json.dumps(self.saved_results, ensure_ascii=False), encoding='utf-8')
+            result_tmp.replace(self.directory / 'saved_results.json')
         except OSError:
             self.status.configure(text='Could not save your collection. / 无法保存生词。', fg='#b84439')
             return

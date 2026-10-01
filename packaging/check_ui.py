@@ -34,10 +34,18 @@ with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, {'LOCALAPPD
                        if hasattr(w, 'cget') and w.winfo_class() == 'Label')
                 app.toggle_saved()
                 assert 'light' in app.saved
+                app.saved_list.selection_set(0)
+                app.open_saved(None)
+                assert app.current == 'light' and service.call_count == 1
+                app.clear_search()
+                assert app.search.get() == '' and app.current == '' and not app.body.winfo_children()
                 app.search_now('我听得一头雾水。')
                 wait(app, lambda: app.status.cget('text').startswith('DeepSeek · Context'))
                 assert app.current == '' and '我听得一头雾水。' not in app.saved
+                app.search.delete(0, 'end')
+                app.on_search_changed()
+                assert app.current == '' and 'cancelled' in app.status.cget('text').lower()
                 assert service.call_count == 2
-        print('UI passed: blank start, detailed word, saved word, Chinese-to-English, one provider.')
+        print('UI passed: blank start, cached saved word, clear control, cancellation, Chinese-to-English, one provider.')
     finally:
         app.close()

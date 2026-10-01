@@ -1,7 +1,10 @@
 # Changelog
 
-## 1.3.4 — detective design and DeepSeek-only learning
+## 1.3.5 — detective design and DeepSeek-only learning
 
+- Cancel or clear an in-progress lookup without leaving a stale analysis state.
+- Cache saved word results so saved entries open instantly without another API call.
+- Clear the input and visible result together with one click.
 - Replace offline and third-party dictionary/translation services with DeepSeek for every result.
 - Explain English words sense by sense with detailed English definitions and bilingual examples.
 - Translate English to Chinese and Chinese to natural English.
@@ -55,5 +58,6 @@ sentence translations; optional online service may fail; installer is unsigned.
 ## 1.0.0 — earlier local milestone (not a GitHub release)
 
 - Original desktop dictionary, starter entries, online lookup, cache, and saved words.
+
 
 

@@ -138,7 +138,7 @@ def lookup(text, key):
                                               'Content-Type': 'application/json',
                                                'User-Agent': 'LanGo/1.3.2'})
     try:
-        with urllib.request.urlopen(request, timeout=90) as response:
+        with urllib.request.urlopen(request, timeout=30) as response:
             data = json.load(response)
         content = data['choices'][0]['message']['content']
         if data['choices'][0].get('finish_reason') == 'length':

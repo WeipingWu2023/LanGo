@@ -6,7 +6,7 @@ LanGo 1.3 is a Windows 10/11 x64 desktop app for learning English with DeepSeek.
 
 ## Install
 
-Download the [LanGo 1.3.5 release](https://github.com/WeipingWu2023/LanGo/releases/tag/v1.3.5), run `LanGo-Setup-1.3.5-Windows-x64.exe`, and open LanGo from the desktop or Start menu. Python and administrator rights are not needed. The installer is unsigned, so Windows may show an unknown-publisher warning. Compare the installer SHA-256 hash with `SHA256SUMS.txt` in the release.
+Download the [LanGo 1.3.6 release](https://github.com/WeipingWu2023/LanGo/releases/tag/v1.3.6), run `LanGo-Setup-1.3.6-Windows-x64.exe`, and open LanGo from the desktop or Start menu. Python and administrator rights are not needed. The installer is unsigned, so Windows may show an unknown-publisher warning. Compare the installer SHA-256 hash with `SHA256SUMS.txt` in the release.
 
 The app has no API-key prompt. After installing, copy `settings.example.json` from the LanGo install folder to `%LOCALAPPDATA%\\LanGo\\settings.json`, then replace `sk-your-key-here` with your own key. Each person who installs LanGo can configure their own file. Never put a key in the installer or repository. [DeepSeek's official API guide](https://api-docs.deepseek.com/guides/harness) explains account setup. DeepSeek charges for API use; check [current model prices](https://api-docs.deepseek.com/quick_start/pricing/) before heavy use.
 
@@ -55,9 +55,10 @@ To build the installer, install [Inno Setup 6](https://jrsoftware.org/isdl.php) 
 .\packaging\build.ps1 -Python .\.venv\Scripts\python.exe
 ```
 
-The build produces `release/LanGo-Setup-1.3.5-Windows-x64.exe` and `release/SHA256SUMS.txt`. Build output and personal data are ignored by Git. The API key is entered by each user after installation. Run the UI check with a desktop session; it uses a temporary user-data directory and fake key.
+The build produces `release/LanGo-Setup-1.3.6-Windows-x64.exe` and `release/SHA256SUMS.txt`. Build output and personal data are ignored by Git. The API key is entered by each user after installation. Run the UI check with a desktop session; it uses a temporary user-data directory and fake key.
 
 LanGo code, the original detective artwork, and icon are [MIT licensed](LICENSE). Runtime and service notices are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Earlier releases with ECDICT/WordNet remain available through their version tags and release assets; those datasets are not shipped in version 1.3. See [CHANGELOG.md](CHANGELOG.md).
+
 
 
 

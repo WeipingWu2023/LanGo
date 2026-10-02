@@ -28,7 +28,9 @@ with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, {'LOCALAPPD
         with patch.dict('os.environ', {'DEEPSEEK_API_KEY': 'sk-' + 'a' * 32}):
             with patch('lango_app.lookup', side_effect=[WORD, TRANSLATION]) as service:
                 app.search_now('light')
+                assert app.investigate_button.cget('text').startswith('Cancel')
                 wait(app, lambda: app.current == 'light')
+                assert app.investigate_button.cget('text').startswith('Investigate')
                 assert any('Visible electromagnetic radiation.' in w.cget('text')
                        for card in app.body.winfo_children() for w in card.winfo_children()
                        if hasattr(w, 'cget') and w.winfo_class() == 'Label')

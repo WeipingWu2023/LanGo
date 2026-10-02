@@ -96,8 +96,10 @@ class App(tk.Tk):
         self.search.pack(side='left', fill='x', expand=True, padx=10)
         self.search.bind('<Return>', lambda e: self.search_now())
         self.search.bind('<KeyRelease>', self.on_search_changed)
-        self.button(bar, 'Clear ×', self.clear_search).pack(side='right', padx=(0, 6))
-        self.button(bar, 'Investigate  →', self.search_now, True).pack(side='right')
+        self.clear_button = self.button(bar, 'Clear ×', self.clear_search)
+        self.clear_button.pack(side='right', padx=(0, 6))
+        self.investigate_button = self.button(bar, 'Investigate  →', self.search_now, True)
+        self.investigate_button.pack(side='right')
         self.status = self.label(main, 'Enter an English word, an English sentence, or Chinese text.', 10, MUTED)
         self.status.pack(anchor='w', pady=11)
         frame = tk.Frame(main, bg=PAPER)
@@ -154,6 +156,7 @@ class App(tk.Tk):
         self.current = ''
         self.current_result = None
         self.clear()
+        self.investigate_button.configure(text='Investigate  →', command=self.search_now)
         self.status.configure(text='Search cancelled. Enter a new word or sentence.', fg=MUTED)
 
     def search_now(self, text=None):
@@ -171,6 +174,7 @@ class App(tk.Tk):
         self.current = ''
         self.current_result = None
         self.clear()
+        self.investigate_button.configure(text='Cancel  ×', command=self.cancel_search)
         self.status.configure(text='DeepSeek is investigating… / 正在分析…', fg=BLUE)
         def work():
             try: self.events.put((generation, text, lookup(text, key), None))
@@ -183,6 +187,7 @@ class App(tk.Tk):
                 generation, text, result, error = self.events.get_nowait()
                 if generation != self.generation: continue
                 self.clear()
+                self.investigate_button.configure(text='Investigate  →', command=self.search_now)
                 if error:
                     self.status.configure(text=error, fg='#b84439')
                     self.button(self.body, 'Try again / 重试', lambda t=text: self.search_now(t)).pack(anchor='w', pady=10)

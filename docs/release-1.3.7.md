@@ -1,0 +1,20 @@
+# LanGo 1.3.7
+
+This update adds deletion for saved words and their cached analyses.
+
+This update makes cancellation explicit and shortens the DeepSeek network timeout so a slow request cannot look frozen.
+
+This update fixes search cancellation, instant saved-word results, clearing behavior, and adds a one-click input clear control.
+
+LanGo is now a DeepSeek-powered English learning and bilingual translation app with a bright detective theme, original character art, and a redesigned shortcut icon.
+
+English words receive sense-by-sense English definitions, Chinese explanations, usage notes, relevant synonyms and antonyms, and at least three paired English/Chinese examples per returned sense. English sentences translate to Chinese, and Chinese input translates to natural English. All results come from DeepSeek; the former translation-provider quota message is gone.
+
+Each installer includes `settings.example.json`. Copy it to `%LOCALAPPDATA%\LanGo\settings.json` and enter your own key. The key is never bundled or pushed to GitHub. Each installer recipient needs their own key and DeepSeek account. DeepSeek API use may incur charges. The app needs internet for every lookup and AI content can be wrong or incomplete. A response with unusually many senses can exceed the provider's output limit.
+
+Windows 10/11 x64. This installer is unsigned, so Windows may display an unknown-publisher warning. Verify `LanGo-Setup-1.3.7-Windows-x64.exe` using `SHA256SUMS.txt`. Running the installer updates the existing installation and leaves saved words in `%LOCALAPPDATA%\LanGo` intact.
+
+
+
+
+

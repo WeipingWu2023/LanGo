@@ -39,6 +39,8 @@ with tempfile.TemporaryDirectory() as folder, patch.dict(os.environ, {'LOCALAPPD
                 app.saved_list.selection_set(0)
                 app.open_saved(None)
                 assert app.current == 'light' and service.call_count == 1
+                app.delete_saved()
+                assert 'light' not in app.saved and app.saved_list.size() == 0
                 app.clear_search()
                 assert app.search.get() == '' and app.current == '' and not app.body.winfo_children()
                 app.search_now('我听得一头雾水。')

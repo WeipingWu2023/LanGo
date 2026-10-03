@@ -81,6 +81,7 @@ class App(tk.Tk):
         self.saved_list.pack(fill='x', padx=18, pady=8)
         self.saved_list.bind('<<ListboxSelect>>', self.open_saved)
         self.refresh_saved()
+        self.button(side, 'Delete selected  ×', self.delete_saved).pack(fill='x', padx=18, pady=(0, 10))
         self.label(side, 'RECENT CLUES', 9, '#92b1ec', True).pack(anchor='w', padx=22, pady=(13, 5))
         self.recent = tk.Frame(side, bg=NAVY)
         self.recent.pack(fill='x', padx=18)
@@ -256,6 +257,30 @@ class App(tk.Tk):
             self.render_word(word, cached)
         else:
             self.search_now(word)
+
+    def delete_saved(self):
+        selected = self.saved_list.curselection()
+        if not selected:
+            return
+        word = self.saved_list.get(selected[0])
+        self.saved = [item for item in self.saved if item != word]
+        self.saved_results.pop(word.lower(), None)
+        try:
+            self.directory.mkdir(parents=True, exist_ok=True)
+            saved_tmp = self.directory / 'saved.tmp'
+            saved_tmp.write_text(json.dumps(self.saved, ensure_ascii=False), encoding='utf-8')
+            saved_tmp.replace(self.directory / 'saved.json')
+            result_tmp = self.directory / 'saved_results.tmp'
+            result_tmp.write_text(json.dumps(self.saved_results, ensure_ascii=False), encoding='utf-8')
+            result_tmp.replace(self.directory / 'saved_results.json')
+        except OSError:
+            self.status.configure(text='Could not update your collection. / 无法更新生词。', fg='#b84439')
+            return
+        if self.search.get().strip().lower() == word.lower() or self.current == word.lower():
+            self.cancel_search()
+            self.search.delete(0, 'end')
+        self.refresh_saved()
+        self.status.configure(text=f'Removed {word} from your case files. / 已删除 {word}。', fg=MUTED)
 
     def toggle_saved(self):
         if not self.current: return

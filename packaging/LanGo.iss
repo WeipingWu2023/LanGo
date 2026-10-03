@@ -1,4 +1,4 @@
-#define AppVersion "1.3.6"
+#define AppVersion "1.3.7"
 
 [Setup]
 AppId={{B3A6E2D8-3C51-4D12-9A20-7D4C8E1F6B90}
@@ -40,6 +40,7 @@ Name: "{autoprograms}\LanGo"; Filename: "{app}\LanGo.exe"
 
 [Run]
 Filename: "{app}\LanGo.exe"; Description: "Open LanGo"; Flags: nowait postinstall skipifsilent
+
 
 
 

@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.6 — responsive search controls and DeepSeek-only learning
+## 1.3.7 — saved-word deletion and responsive search
 
 - Cancel or clear an in-progress lookup without leaving a stale analysis state.
 - Cache saved word results so saved entries open instantly without another API call.
@@ -58,6 +58,8 @@ sentence translations; optional online service may fail; installer is unsigned.
 ## 1.0.0 — earlier local milestone (not a GitHub release)
 
 - Original desktop dictionary, starter entries, online lookup, cache, and saved words.
+
+
 
 
 
